@@ -40,6 +40,7 @@ public class LoginController {
             String name = resultSet.getString("name");
             String pass = resultSet.getString("password");
             String role = resultSet.getString("role_name");
+            int userId = resultSet.getInt("id");
             
             System.out.println(name);
             System.out.println(pass);
@@ -47,13 +48,14 @@ public class LoginController {
             
             loginDto.setLoginCredential(name, pass, role);
             loginDto.setIsLogged(true);
+            
+            new UserModel().setUser(name,role,userId);
         }
          
          resultSet.close();
          statement.close();
          conn.close();
          
-         new UserModel().setUser(loginDto.name,loginDto.roleName);
         
          return loginDto.isLogged();
          

@@ -1,17 +1,27 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package laporan;
+
 import helper.ComboItem;
 import javax.swing.*;
 import java.sql.*;
+import java.util.ArrayList;
+import models.ProductModel;
+import product.ProductController;
+import java.util.Date;
+import javax.swing.table.DefaultTableModel;
+import models.LaporanPenjualanModel;
 
 /**
- *
+ *  
  * @author deadg
  */
 public class LaporanPenjualan extends javax.swing.JFrame {
+    public Connection connection;
+    private ProductController productCtr;
+    private LaporanPenjualanController lpCtr;
 
     /**
      * Creates new form LaporanPenjualan
@@ -21,27 +31,82 @@ public class LaporanPenjualan extends javax.swing.JFrame {
         setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
         
         loadComboBoxFromDatabase();
+        dateFrom.setDate(new Date());
+        dateTo.setDate(new Date());
     }
     
     private void loadComboBoxFromDatabase() {
-        String url = "jdbc:mysql://localhost:3306/your_database";
-        String user = "root";
-        String password = "your_password";
+        try {
+            productCtr = new ProductController();
+            ArrayList<ProductModel> products = productCtr.renderProducts();
+            
+            listProduct.addItem(new ComboItem(0, "Semua Produk"));
+        
+            for(ProductModel product : products) {
+                listProduct.addItem(new ComboItem(product.id, product.name));
+            }
+        } catch(Exception e){
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+    }
 
-        try (Connection conn = DriverManager.getConnection(url, user, password)) {
-            String sql = "SELECT id, name FROM products";
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                listProduct.addItem(new ComboItem(id, name));
+    
+    private void processData() {
+        ArrayList<LaporanPenjualanModel> data;
+        
+        try {
+            ComboItem selectedItem = (ComboItem) listProduct.getSelectedItem();
+            if (selectedItem == null) {
+                JOptionPane.showMessageDialog(this, "Silakan pilih produk terlebih dahulu.");
+                return;
             }
 
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error loading data: " + e.getMessage());
+            int productId = selectedItem.getId();
+
+            if (dateFrom.getDate() == null || dateTo.getDate() == null) {
+                JOptionPane.showMessageDialog(this, "Tanggal mulai dan akhir harus diisi.");
+                return;
+            }
+            
+            java.util.Date fromDate = dateFrom.getDate();
+            java.util.Date toDate = dateTo.getDate();
+
+            java.sql.Date tanggalDari = new java.sql.Date(fromDate.getTime());
+            java.sql.Date tanggalSampai = new java.sql.Date(toDate.getTime());
+
+            lpCtr = new LaporanPenjualanController();
+            
+            if(selectedItem.getName().equals("Semua Produk")) {
+                data = lpCtr.renderAllPenjualan(tanggalDari, tanggalSampai);
+            } else {
+                data = lpCtr.renderLaporanPenjualan(productId, tanggalDari, tanggalSampai);
+            }
+            
+            updateTable(data);
+        } catch(Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
         }
+    }
+    
+    private void updateTable(ArrayList<LaporanPenjualanModel> data) {
+        DefaultTableModel model = (DefaultTableModel) tableLaporan.getModel();
+        model.setRowCount(0);
+
+        int no = 1;
+        for (LaporanPenjualanModel item : data) {
+            Object[] row = {
+                no++,
+                item.getProductName(),
+                item.getTotalTerjual(),
+                formatRupiah(item.getTotalPendapatan())
+            };
+            model.addRow(row);
+        }
+    }
+
+    private String formatRupiah(double amount) {
+        java.text.NumberFormat currencyFormat = java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("in", "ID"));
+        return currencyFormat.format(amount);
     }
 
     /**
@@ -54,20 +119,20 @@ public class LaporanPenjualan extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tableLaporan = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         listProduct = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jDateChooser1 = new com.toedter.calendar.JDateChooser();
+        dateFrom = new com.toedter.calendar.JDateChooser();
         jLabel4 = new javax.swing.JLabel();
-        jDateChooser2 = new com.toedter.calendar.JDateChooser();
-        jButton1 = new javax.swing.JButton();
+        dateTo = new com.toedter.calendar.JDateChooser();
+        btnCari = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tableLaporan.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -86,13 +151,13 @@ public class LaporanPenjualan extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jTable1.setRowHeight(30);
-        jScrollPane1.setViewportView(jTable1);
-        if (jTable1.getColumnModel().getColumnCount() > 0) {
-            jTable1.getColumnModel().getColumn(0).setResizable(false);
-            jTable1.getColumnModel().getColumn(1).setResizable(false);
-            jTable1.getColumnModel().getColumn(2).setResizable(false);
-            jTable1.getColumnModel().getColumn(3).setResizable(false);
+        tableLaporan.setRowHeight(30);
+        jScrollPane1.setViewportView(tableLaporan);
+        if (tableLaporan.getColumnModel().getColumnCount() > 0) {
+            tableLaporan.getColumnModel().getColumn(0).setResizable(false);
+            tableLaporan.getColumnModel().getColumn(1).setResizable(false);
+            tableLaporan.getColumnModel().getColumn(2).setResizable(false);
+            tableLaporan.getColumnModel().getColumn(3).setResizable(false);
         }
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
@@ -109,8 +174,13 @@ public class LaporanPenjualan extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
         jLabel4.setText("Sampai Tanggal");
 
-        jButton1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jButton1.setText("Cari");
+        btnCari.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        btnCari.setText("Cari");
+        btnCari.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCariActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -126,14 +196,14 @@ public class LaporanPenjualan extends javax.swing.JFrame {
                 .addGap(34, 34, 34)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
-                    .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(dateFrom, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(29, 29, 29)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jDateChooser2, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(dateTo, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(35, 35, 35)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnCari, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(49, 49, 49))
         );
         jPanel2Layout.setVerticalGroup(
@@ -152,9 +222,9 @@ public class LaporanPenjualan extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(listProduct, javax.swing.GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE)
-                            .addComponent(jDateChooser1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jDateChooser2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(dateFrom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(dateTo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnCari, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(38, Short.MAX_VALUE))
         );
 
@@ -181,6 +251,10 @@ public class LaporanPenjualan extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnCariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCariActionPerformed
+        processData();
+    }//GEN-LAST:event_btnCariActionPerformed
 
     /**
      * @param args the command line arguments
@@ -218,16 +292,16 @@ public class LaporanPenjualan extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private com.toedter.calendar.JDateChooser jDateChooser1;
-    private com.toedter.calendar.JDateChooser jDateChooser2;
+    private javax.swing.JButton btnCari;
+    private com.toedter.calendar.JDateChooser dateFrom;
+    private com.toedter.calendar.JDateChooser dateTo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     private javax.swing.JComboBox<ComboItem> listProduct;
+    private javax.swing.JTable tableLaporan;
     // End of variables declaration//GEN-END:variables
 }

@@ -10,10 +10,16 @@ package models;
  */
 public class UserModel {
    public static String name;
+   public static int userId;
    public static String roleName;
 
-   public static void setUser(String nameUser,String role)   {
+   public static void setUser(String nameUser,String role, int idUser)   {
        name = nameUser;
        roleName = role;
+       userId = idUser;
+   }
+   
+   public static String getName(){
+       return name;
    }
 }

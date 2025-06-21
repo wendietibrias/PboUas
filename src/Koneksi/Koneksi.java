@@ -14,10 +14,9 @@ import java.sql.DriverManager;
 public class Koneksi {
     public Connection connection;
     
-    public String dbUrl = "jdbc:mysql://localhost:3306/pbo_uas";
+    public String dbUrl = "jdbc:mysql://localhost:3306/pbo_uas?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
     public String dbUser = "root";
-    public String dbPass = "Wendi#123";
-    public String dbName = "pbo_pos_uas";
+    public String dbPass = "alvin123";
     
     public Koneksi(){
         try {

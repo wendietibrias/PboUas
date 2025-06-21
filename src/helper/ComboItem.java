@@ -11,7 +11,7 @@ package helper;
  */
 // ComboItem.java
 public class ComboItem {
-    private int id;
+    private  int id;
     private String name;
 
     public ComboItem(int id, String name) {
