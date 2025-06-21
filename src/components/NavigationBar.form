@@ -36,18 +36,12 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="produkLink" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="supplierLink" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="customerLink" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="warehouseLink" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="kategoriProdukLink" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="paymentMethodLink" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace pref="174" max="32767" attributes="0"/>
+              <EmptySpace pref="486" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -58,11 +52,8 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="homeLink" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="produkLink" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="supplierLink" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="customerLink" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="warehouseLink" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="kategoriProdukLink" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="paymentMethodLink" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -89,46 +80,44 @@
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="produkLinkMouseClicked"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="supplierLink">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Supplier"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JButton" name="customerLink">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Customer"/>
-      </Properties>
-    </Component>
     <Component class="javax.swing.JButton" name="warehouseLink">
       <Properties>
         <Property name="text" type="java.lang.String" value="Warehouse"/>
       </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="warehouseLinkMouseClicked"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="kategoriProdukLink">
       <Properties>
         <Property name="text" type="java.lang.String" value="Kategori Produk"/>
       </Properties>
-    </Component>
-    <Component class="javax.swing.JButton" name="paymentMethodLink">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Metode Pembayaran"/>
-      </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="kategoriProdukLinkMouseClicked"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="penjualanLink">
       <Properties>
         <Property name="text" type="java.lang.String" value="Penjualan"/>
       </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="penjualanLinkMouseClicked"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="pembelianLink">
       <Properties>
         <Property name="text" type="java.lang.String" value="Pembelian"/>
       </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="pembelianLinkMouseClicked"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="penyimpananLink">
       <Properties>
         <Property name="text" type="java.lang.String" value="Penyimpanan"/>
       </Properties>
       <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="penyimpananLinkMouseClicked"/>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="penyimpananLinkActionPerformed"/>
       </Events>
     </Component>

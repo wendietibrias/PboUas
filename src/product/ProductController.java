@@ -24,6 +24,7 @@ public class ProductController {
         try {
            koneksiInit = new Koneksi();
            conn = koneksiInit.connection;
+            
         } catch(Exception e){
            System.out.println(e.getMessage());
         }
@@ -86,7 +87,7 @@ public class ProductController {
                                  " LEFT JOIN product_category ON products.product_category_id = product_category.id";
           Statement statement = conn.createStatement();
           ResultSet resultSet = statement.executeQuery(getAllProduct);
-            
+          
           while(resultSet.next()){
               ProductModel productModel = new ProductModel();
               String name = resultSet.getString("name");

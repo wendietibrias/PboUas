@@ -4,6 +4,11 @@
  */
 package components;
 
+import product.ProductIndex;
+import purchasing.PurchasingIndex;
+import sales.SalesIndex;
+import warehouse.WarehouseIndex;
+
 /**
  *
  * @author Asus
@@ -28,11 +33,8 @@ public class NavigationBar extends javax.swing.JPanel {
 
         homeLink = new javax.swing.JButton();
         produkLink = new javax.swing.JButton();
-        supplierLink = new javax.swing.JButton();
-        customerLink = new javax.swing.JButton();
         warehouseLink = new javax.swing.JButton();
         kategoriProdukLink = new javax.swing.JButton();
-        paymentMethodLink = new javax.swing.JButton();
         penjualanLink = new javax.swing.JButton();
         pembelianLink = new javax.swing.JButton();
         penyimpananLink = new javax.swing.JButton();
@@ -48,21 +50,40 @@ public class NavigationBar extends javax.swing.JPanel {
             }
         });
 
-        supplierLink.setText("Supplier");
-
-        customerLink.setText("Customer");
-
         warehouseLink.setText("Warehouse");
+        warehouseLink.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                warehouseLinkMouseClicked(evt);
+            }
+        });
 
         kategoriProdukLink.setText("Kategori Produk");
-
-        paymentMethodLink.setText("Metode Pembayaran");
+        kategoriProdukLink.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                kategoriProdukLinkMouseClicked(evt);
+            }
+        });
 
         penjualanLink.setText("Penjualan");
+        penjualanLink.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                penjualanLinkMouseClicked(evt);
+            }
+        });
 
         pembelianLink.setText("Pembelian");
+        pembelianLink.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                pembelianLinkMouseClicked(evt);
+            }
+        });
 
         penyimpananLink.setText("Penyimpanan");
+        penyimpananLink.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                penyimpananLinkMouseClicked(evt);
+            }
+        });
         penyimpananLink.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 penyimpananLinkActionPerformed(evt);
@@ -87,16 +108,10 @@ public class NavigationBar extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(produkLink)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(supplierLink)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(customerLink)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(warehouseLink)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(kategoriProdukLink)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(paymentMethodLink)))
-                .addContainerGap(174, Short.MAX_VALUE))
+                        .addComponent(kategoriProdukLink)))
+                .addContainerGap(486, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -105,11 +120,8 @@ public class NavigationBar extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(homeLink)
                     .addComponent(produkLink)
-                    .addComponent(supplierLink)
-                    .addComponent(customerLink)
                     .addComponent(warehouseLink)
-                    .addComponent(kategoriProdukLink)
-                    .addComponent(paymentMethodLink))
+                    .addComponent(kategoriProdukLink))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(penjualanLink)
@@ -124,21 +136,48 @@ public class NavigationBar extends javax.swing.JPanel {
     }//GEN-LAST:event_penyimpananLinkActionPerformed
 
     private void produkLinkMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_produkLinkMouseClicked
-        // TODO add your handling code here:
-        
+               // TODO add your handling code here:
+       this.setVisible(false);
+       new ProductIndex().setVisible(true);
     }//GEN-LAST:event_produkLinkMouseClicked
+
+    private void warehouseLinkMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_warehouseLinkMouseClicked
+        // TODO add your handling code here:
+        this.setVisible(false);
+        new WarehouseIndex().setVisible(true);
+    }//GEN-LAST:event_warehouseLinkMouseClicked
+
+    private void kategoriProdukLinkMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_kategoriProdukLinkMouseClicked
+        // TODO add your handling code here:
+        this.setVisible(false);
+        new productCategory.ProductCategory().setVisible(true);
+    }//GEN-LAST:event_kategoriProdukLinkMouseClicked
+
+    private void penjualanLinkMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_penjualanLinkMouseClicked
+        // TODO add your handling code here:
+        this.setVisible(false);
+        new SalesIndex().setVisible(true);
+    }//GEN-LAST:event_penjualanLinkMouseClicked
+
+    private void pembelianLinkMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pembelianLinkMouseClicked
+        // TODO add your handling code here:
+        this.setVisible(false);
+        new PurchasingIndex().setVisible(true);
+    }//GEN-LAST:event_pembelianLinkMouseClicked
+
+    private void penyimpananLinkMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_penyimpananLinkMouseClicked
+        // TODO add your handling code here:
+        this.setVisible(false);
+    }//GEN-LAST:event_penyimpananLinkMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton customerLink;
     private javax.swing.JButton homeLink;
     private javax.swing.JButton kategoriProdukLink;
-    private javax.swing.JButton paymentMethodLink;
     private javax.swing.JButton pembelianLink;
     private javax.swing.JButton penjualanLink;
     private javax.swing.JButton penyimpananLink;
     private javax.swing.JButton produkLink;
-    private javax.swing.JButton supplierLink;
     private javax.swing.JButton warehouseLink;
     // End of variables declaration//GEN-END:variables
 }

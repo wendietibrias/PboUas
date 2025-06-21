@@ -14,4 +14,22 @@ public class PurchasingDetailModel {
     public int qty;
     public int productId;
     public int price;
+    public int grandtotal;
+   
+    public void createPurchasingDetail(
+       int subtotal,
+       int qty,
+       int productId,
+       int price,
+       int grandtotal,
+       int purchaseId
+    ){
+       this.subtotal = subtotal;
+       this.qty = qty;
+       this.price = price;
+       this.grandtotal = grandtotal;
+       this.productId = productId;
+       this.purchasingId = purchaseId;
+    }
+    
 }
