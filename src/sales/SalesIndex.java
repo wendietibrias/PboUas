@@ -4,17 +4,68 @@
  */
 package sales;
 
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Locale;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import models.PurchasingModel;
+import models.SalesModel;
+
 /**
  *
  * @author Windows 10
  */
 public class SalesIndex extends javax.swing.JFrame {
-
+   SalesController salesController;
+    public void displayTable(){
+        try {
+            ArrayList<SalesModel> salesItems = salesController.renderSales();
+           DefaultTableModel tableModel = new DefaultTableModel();
+           
+           Locale locale = new Locale("id","ID");
+           NumberFormat formatter = NumberFormat.getCurrencyInstance(locale);
+                      
+           tableModel.setRowCount(0);
+           
+           tableModel.addColumn("No");
+           tableModel.addColumn("Nomor Penjualan");
+           tableModel.addColumn("Tanggal Penjualan");
+           tableModel.addColumn("Gudang");
+           tableModel.addColumn("subtotal");
+           tableModel.addColumn("grandtotal");
+           
+           for(int i = 0; i < salesItems.size(); i++){
+               
+               String formattedSubtotal = formatter.format(salesItems.get(i).subtotal);
+               String formattedGrandtotal = formatter.format(salesItems.get(i).grandtotal);
+               
+               Object[] row = {
+                  salesItems.get(i).id,
+                  salesItems.get(i).salesNumber,
+                  salesItems.get(i).salesDate,
+                  salesItems.get(i).warehouseName,
+                  formattedSubtotal,
+                  formattedGrandtotal
+               };
+               
+               tableModel.addRow(row);
+           }
+           
+           salesTable.setModel(tableModel);
+             
+        } catch(Exception e){
+            JOptionPane.showMessageDialog(null,e.getMessage());
+        }
+    }
+   
     /**
      * Creates new form SalesIndex
      */
     public SalesIndex() {
         initComponents();
+        salesController = new SalesController();
+        this.displayTable();
     }
 
     /**
@@ -27,28 +78,24 @@ public class SalesIndex extends javax.swing.JFrame {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jButton3 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        salesTable = new javax.swing.JTable();
         navigationBar1 = new components.NavigationBar();
-        jButton4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setText("Daftar Penjualan");
 
-        jButton3.setText("Hapus Penjualan");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+        jButton1.setText("Tambah Penjualan");
+        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton1MouseClicked(evt);
             }
         });
 
-        jButton1.setText("Tambah Penjualan");
-
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        salesTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
@@ -59,14 +106,7 @@ public class SalesIndex extends javax.swing.JFrame {
                 "No", "Nomor Penjualan", "Total Produk", "Gudang", "Subtotal", "Grandtotal"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
-
-        jButton4.setText("Detail Penjualan");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
-            }
-        });
+        jScrollPane1.setViewportView(salesTable);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -79,10 +119,6 @@ public class SalesIndex extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton1)
                         .addGap(4, 4, 4)))
                 .addGap(24, 24, 24))
@@ -97,9 +133,7 @@ public class SalesIndex extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jButton3)
-                    .addComponent(jButton1)
-                    .addComponent(jButton4))
+                    .addComponent(jButton1))
                 .addGap(25, 25, 25)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18))
@@ -108,13 +142,11 @@ public class SalesIndex extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton3ActionPerformed
-
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton4ActionPerformed
+        new SalesIndex().setVisible(false);
+        new SalesForm().setVisible(true);
+    }//GEN-LAST:event_jButton1MouseClicked
 
     /**
      * @param args the command line arguments
@@ -153,11 +185,9 @@ public class SalesIndex extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     private components.NavigationBar navigationBar1;
+    private javax.swing.JTable salesTable;
     // End of variables declaration//GEN-END:variables
 }

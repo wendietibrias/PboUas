@@ -5,10 +5,7 @@
 package laporan;
 
 import Koneksi.Koneksi;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import models.LaporanPenjualanModel;
 
@@ -29,29 +26,35 @@ public class LaporanPenjualanController {
         }
     }
     
-    public ArrayList<LaporanPenjualanModel> renderLaporanPenjualan(int productId, java.sql.Date dateFrom, java.sql.Date dateTo) {
+    public ArrayList<LaporanPenjualanModel> getLaporanPenjualanByField(int productId, java.sql.Date dateFrom, java.sql.Date dateTo) {
         ArrayList<LaporanPenjualanModel> laporanPenjualanList = new ArrayList<>();
         
-        try {
-            String getLaporanPenjualan = "SELECT p.name AS product_name, "
-                                    + "SUM(sd.qty) AS total_terjual, "
-                                    + "SUM(sd.subtotal) AS total_pendapatan "
-                                    + "FROM sales s "
-                                    + "JOIN sales_detail sd ON s.id = sd.sales_id "
-                                    + "JOIN products p ON p.id = sd.product_id "
-                                    + "WHERE sd.product_id = " + productId + " "
-                                    + "AND s.sales_date BETWEEN '" + dateFrom + "' AND '" + dateTo + "' "
-                                    + "GROUP BY p.id";
-            
-            Statement statement = conn.createStatement();
-            ResultSet rs = statement.executeQuery(getLaporanPenjualan);
+        String sql = "SELECT s.sales_date as tanggal, "
+                    + "s.sales_number as nomor_penjualan, "
+                    + "sd.qty as total_terjual, "
+                    + "sd.subtotal as subtotal, "
+                    + "s.payment_method as metode_pembayaran "
+                    + "FROM sales s "
+                    + "JOIN sales_detail sd ON s.id = sd.sales_id "
+                    + "JOIN products p ON p.id = sd.product_id "
+                    + "WHERE sd.product_id = ? "
+                    + "AND s.sales_date BETWEEN ? AND ? ";
+        
+        try(PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            ps.setDate(2, dateFrom);
+            ps.setDate(3, dateTo);
+
+            ResultSet rs = ps.executeQuery();
             
             while(rs.next()) {
-                String productName = rs.getString("product_name");
+                java.sql.Date tanggal = rs.getDate("tanggal");
+                String nomorPenjualan = rs.getString("nomor_penjualan");
                 int totalTerjual = rs.getInt("total_terjual");
-                double totalPendapatan = rs.getDouble("total_pendapatan");
+                double subtotal = rs.getDouble("subtotal");
+                String metodePembayaran = rs.getString("metode_pembayaran");
                 
-                LaporanPenjualanModel item = new LaporanPenjualanModel(productName, totalTerjual, totalPendapatan);
+                LaporanPenjualanModel item = new LaporanPenjualanModel(tanggal, nomorPenjualan, totalTerjual, subtotal, metodePembayaran);
                 laporanPenjualanList.add(item);
             }
         } catch(SQLException e){
@@ -61,28 +64,32 @@ public class LaporanPenjualanController {
         return laporanPenjualanList;
     }
     
-    public ArrayList<LaporanPenjualanModel> renderAllPenjualan(java.sql.Date dateFrom, java.sql.Date dateTo) {
+    public ArrayList<LaporanPenjualanModel> getAllLaporanPenjualan(java.sql.Date dateFrom, java.sql.Date dateTo) {
         ArrayList<LaporanPenjualanModel> laporanPenjualanList = new ArrayList<>();
         
-        try {
-            String getLaporanPenjualan = "SELECT p.name AS product_name, "
-                                    + "SUM(sd.qty) AS total_terjual, "
-                                    + "SUM(sd.subtotal) AS total_pendapatan "
-                                    + "FROM sales s "
-                                    + "JOIN sales_detail sd ON s.id = sd.sales_id "
-                                    + "JOIN products p ON p.id = sd.product_id "
-                                    + "AND s.sales_date BETWEEN '" + dateFrom + "' AND '" + dateTo + "' "
-                                    + "GROUP BY p.id";
+        String sql = "SELECT p.name AS product_name, "
+                    + "p.sku as SKU, "
+                    + "SUM(sd.qty) AS total_terjual, "
+                    + "SUM(sd.subtotal) AS total_pendapatan "
+                    + "FROM sales s "
+                    + "JOIN sales_detail sd ON s.id = sd.sales_id "
+                    + "JOIN products p ON p.id = sd.product_id "
+                    + "WHERE s.sales_date BETWEEN ? AND ? "
+                    + "GROUP BY p.id";
+        
+        try(PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDate(1, dateFrom);
+            ps.setDate(2, dateTo);
             
-            Statement statement = conn.createStatement();
-            ResultSet rs = statement.executeQuery(getLaporanPenjualan);
+            ResultSet rs = ps.executeQuery();
             
             while(rs.next()) {
+                String productSKU = rs.getString("sku");
                 String productName = rs.getString("product_name");
                 int totalTerjual = rs.getInt("total_terjual");
                 double totalPendapatan = rs.getDouble("total_pendapatan");
                 
-                LaporanPenjualanModel item = new LaporanPenjualanModel(productName, totalTerjual, totalPendapatan);
+                LaporanPenjualanModel item = new LaporanPenjualanModel(productSKU, productName, totalTerjual, totalPendapatan);
                 laporanPenjualanList.add(item);
             }
         } catch(SQLException e){

@@ -4,17 +4,113 @@
  */
 package sales;
 
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import models.InventoryModel;
+import models.ProductModel;
+import models.SalesModel;
+import models.WarehouseModel;
+import models.salesDetailsModel;
+import purchasing.PurchasingForm;
+import purchasing.PurchasingIndex;
+
 /**
  *
  * @author Windows 10
  */
 public class SalesForm extends javax.swing.JFrame {
+    SalesController salesController;
+    DefaultTableModel tableModel;
+    
+    int currentSalesId = 0;
+    int warehouseId = 0;
+    
+    int subtotal = 0;
+    int grandtotal = 0;
+    
+    public void displaySalesDetails(){
+        try {
+          ArrayList<salesDetailsModel> salesDetailsItem = salesController.salesDetailItems(currentSalesId);
+          
+          for(int i = 0; i < salesDetailsItem.size(); i++){
+             Object[] row = {
+               salesDetailsItem.get(i).id,
+               salesDetailsItem.get(i).productName,
+               salesDetailsItem.get(i).productSku,
+               salesDetailsItem.get(i).productPrice,
+               salesDetailsItem.get(i).qty,
+               salesDetailsItem.get(i).subtotal,
+               salesDetailsItem.get(i).grandtotal
+             };
+             
+             this.tableModel.addRow(row);
+          }
+          
+            
+        } catch(Exception e){
+          System.out.println(e.getMessage());
+          JOptionPane.showMessageDialog(null,e.getMessage());
+        }
+    }
+   
+    public void displayCalculation(){
+       Locale ID = new Locale("id","ID");
+       NumberFormat numberFormat = NumberFormat.getCurrencyInstance(ID);
+           
+       salesSubtotal.setText(numberFormat.format(subtotal));
+       salesGrandtotal.setText(numberFormat.format(grandtotal));
+    }
+    
+    public void setTableDetailColumn(){
+        
+    }
+    
+    public void setTableColumn(){
+        this.tableModel.addColumn("No");
+        this.tableModel.addColumn("Nama Produk");
+        this.tableModel.addColumn("Nomor Sku");
+        this.tableModel.addColumn("Harga");
+        this.tableModel.addColumn("Jumlah");
+        this.tableModel.addColumn("Subtotal");
+        this.tableModel.addColumn("Grandtotal");
 
+    }
+    
     /**
      * Creates new form SalesForm
      */
     public SalesForm() {
         initComponents();
+        salesController = new SalesController();
+        
+        salesController = new SalesController();
+        
+        ArrayList<ProductModel> productItems = salesController.renderProducts();
+        ArrayList<WarehouseModel> warehouseItems = salesController.renderWarehouses();
+        
+        for(int i = 0; i < productItems.size(); i++){
+           String productPrice = String.valueOf(productItems.get(i).price);
+           String idProduct = String.valueOf(productItems.get(i).id);
+           String productName = String.valueOf(productItems.get(i).name);
+           salesProductSelects.addItem(idProduct + " " + productName + " " + productPrice);
+        }
+        
+        for(int j =0; j < warehouseItems.size(); j++){
+            String warehouseId = String.valueOf(warehouseItems.get(j).id);
+            String warehouseName = String.valueOf(warehouseItems.get(j).name);   
+            salesWarehouseSelects.addItem(warehouseId + " " + warehouseName);
+        }
+        
+        this.tableModel = new DefaultTableModel();
+        this.tableModel.setRowCount(0);
+        this.setTableColumn();
+        salesDetailTable.setModel(tableModel);
+        
+        this.displayCalculation();
     }
 
     /**
@@ -26,21 +122,312 @@ public class SalesForm extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel1 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        salesNumber = new javax.swing.JTextField();
+        jButton2 = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        salesProductSelects = new javax.swing.JComboBox<>();
+        jLabel4 = new javax.swing.JLabel();
+        salesWarehouseSelects = new javax.swing.JComboBox<>();
+        jLabel5 = new javax.swing.JLabel();
+        salesQty = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        salesDate = new com.toedter.calendar.JDateChooser();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        salesDetailTable = new javax.swing.JTable();
+        jLabel7 = new javax.swing.JLabel();
+        salesSubtotal = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        salesGrandtotal = new javax.swing.JLabel();
+        jButton5 = new javax.swing.JButton();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jLabel1.setFont(new java.awt.Font("Poppins", 1, 24)); // NOI18N
+        jLabel1.setText("Tambah Penjualan");
+
+        jButton1.setText("Kembali");
+        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton1MouseClicked(evt);
+            }
+        });
+
+        jLabel2.setText("Nomor Penjualan");
+
+        jButton2.setText("Buat Penjualan");
+        jButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton2MouseClicked(evt);
+            }
+        });
+
+        jLabel3.setText("Pilih Produk");
+
+        jLabel4.setText("Pilih Gudang");
+
+        jLabel5.setText("Jumlah Jual");
+
+        jLabel6.setText("Tanggal Jual");
+
+        jButton3.setText("Tambah Detail");
+        jButton3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton3MouseClicked(evt);
+            }
+        });
+
+        jButton4.setText("Bersihkah Keranjang");
+        jButton4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton4MouseClicked(evt);
+            }
+        });
+
+        salesDetailTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "No", "Nama Produk", "Harga", "Jumlah", "Subtotal", "Grandtotal"
+            }
+        ));
+        jScrollPane1.setViewportView(salesDetailTable);
+
+        jLabel7.setText("Subtotal");
+
+        salesSubtotal.setText("Rp.0");
+
+        jLabel9.setText("Grandtotal");
+
+        salesGrandtotal.setText("Rp.0");
+
+        jButton5.setText("Selesaikan Penjualan");
+        jButton5.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton5MouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(21, 21, 21)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(199, 199, 199)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(salesGrandtotal, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(salesSubtotal, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jButton3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton4)
+                                .addGap(0, 355, Short.MAX_VALUE))
+                            .addComponent(salesDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(126, 126, 126))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(salesQty))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(salesWarehouseSelects, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(salesProductSelects, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(salesNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 611, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)))
+                .addGap(17, 17, 17))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(22, 22, 22)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jButton1))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(salesNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(salesProductSelects, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(salesWarehouseSelects, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(salesQty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel6)
+                    .addComponent(salesDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton3)
+                    .addComponent(jButton4))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(35, 35, 35)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(salesSubtotal))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(salesGrandtotal))
+                .addGap(18, 18, 18)
+                .addComponent(jButton5)
+                .addContainerGap(120, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
+        // TODO add your handling code here:
+        new SalesIndex().setVisible(true);
+        new SalesForm().setVisible(false);
+    }//GEN-LAST:event_jButton1MouseClicked
+
+    private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
+        // TODO add your handling code here:
+        String salesNum = salesNumber.getText();
+        String gudangSelected = salesWarehouseSelects.getSelectedItem().toString();
+        
+        int warehouseId = Integer.parseInt(gudangSelected.split(" ")[0]);
+        
+        Date selectedDate = salesDate.getDate();
+        java.sql.Timestamp sqlTimestamp = new java.sql.Timestamp(selectedDate.getTime());
+        
+        SalesModel salesModel = new SalesModel();
+        
+        salesModel.createSalesInit(salesNum, sqlTimestamp,warehouseId);
+
+        int salesId = salesController.createSales(salesModel);
+        
+        if(salesId > 0){
+          this.currentSalesId = salesId;
+          this.warehouseId = warehouseId;
+          
+          JOptionPane.showMessageDialog(null,"Berhasil Membuat Penjualan");
+        } else{
+          JOptionPane.showMessageDialog(null,"Gagal Membuat Penjualan");
+        }
+        
+    }//GEN-LAST:event_jButton2MouseClicked
+
+    private void jButton3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton3MouseClicked
+        // TODO add your handling code here:
+        String qtyInput = salesQty.getText();
+        int qty = Integer.parseInt(qtyInput);
+        String[] productSelected = salesProductSelects.getSelectedItem().toString().split(" ");
+        
+        int productId = Integer.parseInt(productSelected[0]);
+        int productPrice = Integer.parseInt(productSelected[productSelected.length - 1]);
+        
+        int subtotal = productPrice * qty;
+        int grandtotal = productPrice * qty;
+        
+        salesDetailsModel salesDetailItem = new salesDetailsModel();
+        
+        salesDetailItem.createSalesDetail(currentSalesId, productId, qty, subtotal, grandtotal);
+        
+        boolean isCreateSalesDetail = salesController.createSalesDetails(salesDetailItem);
+        
+        if(isCreateSalesDetail){
+            this.subtotal += subtotal;
+            this.grandtotal += grandtotal;
+            this.displayCalculation();
+            this.displaySalesDetails();
+            
+            JOptionPane.showMessageDialog(null,"Berhasil Membuat Detail Penjualan");
+        } else {
+            JOptionPane.showMessageDialog(null,"Gagal Membuat Detail Penjualan");
+        }
+    }//GEN-LAST:event_jButton3MouseClicked
+
+    private void jButton4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton4MouseClicked
+        // TODO add your handling code here:
+        boolean isDeleted = salesController.handleDeleteAll(currentSalesId);
+        if(isDeleted){
+           JOptionPane.showMessageDialog(null,"Berhasil Membatalkan Proses Penjualan");
+           this.tableModel.setRowCount(0);
+           this.setTableColumn();
+        } else {
+           JOptionPane.showMessageDialog(null,"Gagal Membuat Proses Penjualan");
+        }
+    }//GEN-LAST:event_jButton4MouseClicked
+
+    private void jButton5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton5MouseClicked
+        // TODO add your handling code here:
+        ArrayList<salesDetailsModel> salesDetailItems = salesController.salesDetailItems(currentSalesId);
+        
+        boolean isUpdateSales = salesController.handleUpdateSales(grandtotal, subtotal, currentSalesId);
+        boolean isUpdateInventory = false;
+        
+           for(int j = 0; j < salesDetailItems.size(); j++){
+            InventoryModel inventoryDto = new InventoryModel();
+            int availableQty = salesDetailItems.get(j).qty;
+            int productId = salesDetailItems.get(j).productId;
+            inventoryDto.createInventory(warehouseId,availableQty,productId);
+            boolean isCreated = salesController.handleCreateInventory(inventoryDto);
+            isUpdateInventory = isCreated;
+         }
+         
+         if(isUpdateInventory && isUpdateSales){
+             JOptionPane.showMessageDialog(null,"Proses Penjualan Berhasil");
+             this.currentSalesId=0;
+             this.grandtotal = 0;
+             this.subtotal = 0;
+             
+             this.tableModel.setRowCount(0);
+             salesDetailTable.setModel(this.tableModel);
+             
+             new SalesForm().setVisible(false);
+             new SalesIndex().setVisible(true);
+             
+         } else{
+             JOptionPane.showMessageDialog(null,"Proses Penjualan Gagal Silahkan Coba Lagi");
+         }
+    }//GEN-LAST:event_jButton5MouseClicked
 
     /**
      * @param args the command line arguments
@@ -78,5 +465,27 @@ public class SalesForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JScrollPane jScrollPane1;
+    private com.toedter.calendar.JDateChooser salesDate;
+    private javax.swing.JTable salesDetailTable;
+    private javax.swing.JLabel salesGrandtotal;
+    private javax.swing.JTextField salesNumber;
+    private javax.swing.JComboBox<String> salesProductSelects;
+    private javax.swing.JTextField salesQty;
+    private javax.swing.JLabel salesSubtotal;
+    private javax.swing.JComboBox<String> salesWarehouseSelects;
     // End of variables declaration//GEN-END:variables
 }

@@ -7,66 +7,66 @@ import java.util.ArrayList;
  *
  * @author deadg
  */
-public class SalesModel {
-    private String salesNumber;
-    private Date salesDate;
-    private int grandTotal;
-    private String paymentMethod;
-    private ArrayList<SalesDetailModel> details;
 
+public class SalesModel {
+    public String salesNumber;
+    public int grandtotal;
+    public int subtotal;
+    public java.util.Date salesDate;
+    public java.sql.Date salesDateSql;
+    public int warehouseId;
+    public String warehouseName;
+    public int id;
+    public String paymentMethod;
+    public ArrayList<SalesDetailModel> details;
+    
     public SalesModel() {
         this.details = new ArrayList<>();
     }
 
-    public SalesModel(String salesNumber, Date salesDate, int grandTotal, String paymentMethod) {
+    public SalesModel(String salesNumber, java.sql.Date salesDateSql, int grandtotal, String paymentMethod) {
         this.salesNumber = salesNumber;
-        this.salesDate = salesDate;
-        this.grandTotal = grandTotal;
+        this.salesDateSql = salesDateSql;
+        this.grandtotal = grandtotal;
         this.paymentMethod = paymentMethod;
         this.details = new ArrayList<>();
     }
-
-    public String getSalesNumber() {
-        return salesNumber;
-    }
-
-    public void setSalesNumber(String salesNumber) {
+    
+    public void createSalesInit(String salesNumber,java.util.Date salesDate,int warehouseId){
         this.salesNumber = salesNumber;
-    }
-
-    public Date getSalesDate() {
-        return salesDate;
-    }
-
-    public void setSalesDate(Date salesDate) {
         this.salesDate = salesDate;
-    }
-
-    public int getGrandTotal() {
-        return grandTotal;
-    }
-
-    public void setGrandTotal(int grandTotal) {
-        this.grandTotal = grandTotal;
-    }
-
-    public String getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
+        this.warehouseId = warehouseId;
     }
     
-    public ArrayList<SalesDetailModel> getDetails() {
-        return details;
+    public void createSales(
+       String salesNumber,
+       int grandtotal,
+       int subtotal,
+       int warehouseId,
+       Date salesDate
+    ){
+        this.salesNumber = salesNumber;
+        this.subtotal = subtotal;
+        this.grandtotal = grandtotal;
+        this.warehouseId = warehouseId;
+        this.salesDate = salesDate;
     }
-
-    public void setDetails(ArrayList<SalesDetailModel> details) {
-        this.details = details;
-    }
-
-    public void addDetail(SalesDetailModel detail) {
-        this.details.add(detail);
+    
+    public void setSales(
+       String salesNumber,
+       int subtotal,
+       int grandtotal,
+       int warehouseId,
+       String warehouseName,
+       Date salesDate,
+       int id
+    ){
+       this.salesNumber = salesNumber;
+       this.subtotal = subtotal;
+       this.grandtotal = grandtotal;
+       this.warehouseName = warehouseName;
+       this.salesDate = salesDate;
+       this.warehouseId = warehouseId;
+       this.id = id;
     }
 }

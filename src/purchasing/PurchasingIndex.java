@@ -4,17 +4,70 @@
  */
 package purchasing;
 
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Locale;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import models.PurchasingModel;
+
 /**
  *
  * @author Windows 10
  */
 public class PurchasingIndex extends javax.swing.JFrame {
 
+    PurchasingController purchasingController;
+    
+    public void displayTable(){
+        try {
+            ArrayList<PurchasingModel> purchasingItems = purchasingController.renderPurchasings();
+           DefaultTableModel tableModel = new DefaultTableModel();
+           
+           Locale locale = new Locale("id","ID");
+           NumberFormat formatter = NumberFormat.getCurrencyInstance(locale);
+                      
+           tableModel.setRowCount(0);
+           
+           tableModel.addColumn("No");
+           tableModel.addColumn("Nomor Pembelian");
+           tableModel.addColumn("Tanggal Pembelian");
+           tableModel.addColumn("Gudang");
+           tableModel.addColumn("subtotal");
+           tableModel.addColumn("grandtotal");
+           
+           for(int i = 0; i < purchasingItems.size(); i++){
+               
+               String formattedSubtotal = formatter.format(purchasingItems.get(i).subtotal);
+               String formattedGrandtotal = formatter.format(purchasingItems.get(i).grandtotal);
+               
+               Object[] row = {
+                  purchasingItems.get(i).id,
+                  purchasingItems.get(i).purchaseDate,
+                  purchasingItems.get(i).purchaseNumber,
+                  purchasingItems.get(i).warehouseName,
+                  formattedSubtotal,
+                  formattedGrandtotal
+               };
+               
+               tableModel.addRow(row);
+           }
+           
+           purchaseTable.setModel(tableModel);
+             
+        } catch(Exception e){
+            JOptionPane.showMessageDialog(null,e.getMessage());
+        }
+    }
+    
     /**
      * Creates new form PurchasingIndex
      */
     public PurchasingIndex() {
         initComponents();
+        purchasingController = new PurchasingController();
+        
+        this.displayTable();
     }
 
     /**
@@ -30,7 +83,7 @@ public class PurchasingIndex extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        purchaseTable = new javax.swing.JTable();
         navigationBar1 = new components.NavigationBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -39,10 +92,15 @@ public class PurchasingIndex extends javax.swing.JFrame {
         jLabel1.setText("Daftar Pembelian");
 
         jButton1.setText("Tambah Pembelian");
+        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton1MouseClicked(evt);
+            }
+        });
 
         jButton3.setText("Hapus Pembelian");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        purchaseTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
@@ -53,7 +111,7 @@ public class PurchasingIndex extends javax.swing.JFrame {
                 "No", "Nomor Pembelian", "Total Produk", "Gudang", "Subtotal", "Grandtotal"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(purchaseTable);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -90,6 +148,12 @@ public class PurchasingIndex extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
+        // TODO add your handling code here:
+        new PurchasingIndex().setVisible(false);
+        new PurchasingForm().setVisible(true);
+    }//GEN-LAST:event_jButton1MouseClicked
 
     /**
      * @param args the command line arguments
@@ -131,7 +195,7 @@ public class PurchasingIndex extends javax.swing.JFrame {
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     private components.NavigationBar navigationBar1;
+    private javax.swing.JTable purchaseTable;
     // End of variables declaration//GEN-END:variables
 }

@@ -4,6 +4,8 @@
  */
 package models;
 
+import java.util.Date;
+
 /**
  *
  * @author Windows 10
@@ -15,6 +17,9 @@ public class PurchasingModel {
     public int grandtotal;
     public int warehouseId;
     public int qtyTotal;
+    public Date purchaseDate;
+    
+    public String warehouseName;
     
     public void setPurchasing(
       int id,
@@ -22,17 +27,23 @@ public class PurchasingModel {
       int qtyTotal,
       int subtotal,
       int grandtotal,
-      int warehouseId
+      int warehouseId,
+      String warehouseName,
+      Date purchaseDate
     ) {
+        this.id = id;
         this.purchaseNumber = purchaseNumber;
         this.qtyTotal = qtyTotal;
         this.subtotal = subtotal;
         this.grandtotal = grandtotal;
         this.warehouseId = warehouseId;
+        this.warehouseName = warehouseName;
+        this.purchaseDate = purchaseDate;
     }
     
-    public void createPurchasing(String purchaseNumber,int warehouseId){
+    public void createPurchasing(String purchaseNumber,int warehouseId,Date purchaseDate){
         this.purchaseNumber = purchaseNumber;
         this.warehouseId = warehouseId;
+        this.purchaseDate = purchaseDate;
     }
 }

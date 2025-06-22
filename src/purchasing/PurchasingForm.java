@@ -4,10 +4,17 @@
  */
 package purchasing;
 
+import com.toedter.calendar.JDateChooser;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import models.InventoryModel;
 import models.ProductModel;
+import models.PurchasingDetailModel;
 import models.PurchasingModel;
 import models.WarehouseModel;
 
@@ -24,8 +31,11 @@ public class PurchasingForm extends javax.swing.JFrame {
    int subtotal = 0;
    
    public void displayCalculation(){
-       subtotalDisplay.setText(String.valueOf(this.subtotal));
-       grandtotalDisplay.setText(String.valueOf(this.grandtotal));
+       Locale ID = new Locale("id","ID");
+       NumberFormat numberFormat = NumberFormat.getCurrencyInstance(ID);
+              
+       subtotalDisplay.setText(numberFormat.format(subtotal));
+       grandtotalDisplay.setText(numberFormat.format(grandtotal));
    }
    
    public void displayProductDetailTable(){
@@ -42,7 +52,29 @@ public class PurchasingForm extends javax.swing.JFrame {
        tableModel.addColumn("Harga");
        tableModel.addColumn("Jumlah");
        tableModel.addColumn("Subtotal");
-       tableModel.addColumn("Grandtotal");
+   }
+   
+   public void displayPurchaseDetail(){
+       try {
+         ArrayList<PurchasingDetailModel> purchasingDetailItems = purchasingController.renderPurchaseDetails(currentPurchaseId);
+         
+         for(int i = 0; i < purchasingDetailItems.size(); i++){
+             Object[] row = {
+                 purchasingDetailItems.get(i).id,
+                 purchasingDetailItems.get(i).productName,
+                 purchasingDetailItems.get(i).productPrice,
+                 purchasingDetailItems.get(i).qty,
+                 purchasingDetailItems.get(i).subtotal,
+             };
+             
+             
+             tableModel.addRow(row);
+         }
+         
+       } catch(Exception e){
+         System.out.println(e.getMessage());
+         JOptionPane.showMessageDialog(null,e.getMessage());
+       }
    }
    
     /**
@@ -99,7 +131,6 @@ public class PurchasingForm extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         purchaseNumber = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        jButton3 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         qty = new javax.swing.JTextField();
         jButton4 = new javax.swing.JButton();
@@ -144,8 +175,6 @@ public class PurchasingForm extends javax.swing.JFrame {
 
         jLabel3.setText("Pilih Produk");
 
-        jButton3.setText("Batalkan");
-
         jLabel4.setText("Masukan Jumlah");
 
         jButton4.setText("Tambah Detail");
@@ -182,6 +211,11 @@ public class PurchasingForm extends javax.swing.JFrame {
         grandtotalDisplay.setText("Rp. 0");
 
         jButton7.setText("Selesaikan Pembelian");
+        jButton7.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton7MouseClicked(evt);
+            }
+        });
         jButton7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton7ActionPerformed(evt);
@@ -189,6 +223,8 @@ public class PurchasingForm extends javax.swing.JFrame {
         });
 
         jLabel9.setText("Pilih Gudang");
+
+        purchaseDate.setDateFormatString("yyyy-MM-dd");
 
         jLabel10.setText("Tanggal Beli");
 
@@ -200,6 +236,11 @@ public class PurchasingForm extends javax.swing.JFrame {
         });
 
         jButton5.setText("Bersihkan Keranjang");
+        jButton5.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton5MouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -228,8 +269,6 @@ public class PurchasingForm extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(6, 6, 6)
                                 .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jButton5)
                                 .addGap(0, 0, Short.MAX_VALUE))
@@ -287,7 +326,6 @@ public class PurchasingForm extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton4)
-                    .addComponent(jButton3)
                     .addComponent(jButton5))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -317,14 +355,33 @@ public class PurchasingForm extends javax.swing.JFrame {
 
     private void jButton4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton4MouseClicked
         // TODO add your handling code here:
-        String productSelected = productSelects.getSelectedItem().toString().split(" ")[0];
-        String productSelectedPrice = productSelects.getSelectedItem().toString().split(" ")[2];
+        
+        String[] splitProductName = productSelects.getSelectedItem().toString().split(" ");
+        String productSelected = splitProductName[0];
+        String productSelectedPrice = splitProductName[splitProductName.length - 1];
 
         int productIdFormat = Integer.parseInt(productSelected);
         int qtyInput = Integer.parseInt(qty.getText());
        
         int subtotal = Integer.parseInt(productSelectedPrice) * qtyInput;
         int grandtotal = subtotal;
+        
+        this.subtotal += subtotal;
+        this.grandtotal += grandtotal;
+        
+        PurchasingDetailModel purchasingDetailDto = new PurchasingDetailModel();
+        
+        purchasingDetailDto.createPurchasingDetail(subtotal, qtyInput, productIdFormat, subtotal, grandtotal, currentPurchaseId);
+        
+        boolean isDetailCreated = purchasingController.handleSubmitDetail(purchasingDetailDto);
+        
+        if(isDetailCreated){
+            this.displayPurchaseDetail();
+            this.displayCalculation();
+            JOptionPane.showMessageDialog(null,"Berhasil Menambahkan Detail Pembelian");
+        } else{
+            JOptionPane.showMessageDialog(null,"Gagal Menambahkan Detail pembelian");
+        }
     }//GEN-LAST:event_jButton4MouseClicked
 
     private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
@@ -332,10 +389,13 @@ public class PurchasingForm extends javax.swing.JFrame {
         String purchaseNum = purchaseNumber.getText();
         String selectedWarehouse = gudangSelects.getSelectedItem().toString().split(" ")[0];
         int convertStr = Integer.parseInt(selectedWarehouse);
+        Date selectedDate = purchaseDate.getDate();
+        java.sql.Timestamp sqlTimestamp = new java.sql.Timestamp(selectedDate.getTime());
+
         
         PurchasingModel purchaseModel = new PurchasingModel();
         
-        purchaseModel.createPurchasing(purchaseNum,convertStr);
+        purchaseModel.createPurchasing(purchaseNum,convertStr,sqlTimestamp);
         int currentCreatedId = purchasingController.handleSubmit(purchaseModel);
         
         if(currentCreatedId > 0){
@@ -345,6 +405,59 @@ public class PurchasingForm extends javax.swing.JFrame {
            JOptionPane.showMessageDialog(null, "Gagal Membuat Data Pembelian");
         }
     }//GEN-LAST:event_jButton2MouseClicked
+
+    private void jButton7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton7MouseClicked
+        // TODO add your handling code here:
+         String[] warehouse = gudangSelects.getSelectedItem().toString().split(" ");
+         int warehouseId = Integer.parseInt(warehouse[0]);
+         ArrayList<PurchasingDetailModel> purchasingDetailItems = purchasingController.renderPurchaseDetails(currentPurchaseId);
+         boolean isInventoryCreate = false;
+        
+         boolean isUpdatePurchase = purchasingController.handleUpdatePr(grandtotal, subtotal, currentPurchaseId);
+         
+         for(int j = 0; j < purchasingDetailItems.size(); j++){
+            InventoryModel inventoryDto = new InventoryModel();
+            int availableQty = purchasingDetailItems.get(j).qty;
+            int productId = purchasingDetailItems.get(j).productId;
+            inventoryDto.createInventory(warehouseId,availableQty,productId);
+            boolean isCreated = purchasingController.handleCreateInventory(inventoryDto);
+            isInventoryCreate = isCreated;
+         }
+         
+         if(isInventoryCreate && isUpdatePurchase){
+             JOptionPane.showMessageDialog(null,"Proses Pembelian Berhasil");
+             this.currentPurchaseId=0;
+             this.grandtotal = 0;
+             this.subtotal = 0;
+             
+             this.tableModel.setRowCount(0);
+             purchaseDetailTable.setModel(this.tableModel);
+             
+             new PurchasingForm().setVisible(false);
+             new PurchasingIndex().setVisible(true);
+             
+         } else{
+             JOptionPane.showMessageDialog(null,"Proses Pembelian Gagal Silahkan Coba Lagi");
+         }
+    }//GEN-LAST:event_jButton7MouseClicked
+
+    private void jButton5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton5MouseClicked
+        // TODO add your handling code here:
+        if(this.currentPurchaseId < 1){
+            JOptionPane.showMessageDialog(null,"Tidak Ada Data Yang Perlu Dihapus");
+        } else {
+            boolean isDeleted = purchasingController.handleDeleteAll(currentPurchaseId);
+            if(isDeleted){
+              JOptionPane.showMessageDialog(null, "Berhasil Menghapus Pembelian Saat Ini");
+              this.tableModel.setRowCount(0);
+              this.setTableColumn();
+              
+              this.grandtotal=0;
+              this.subtotal=0;
+              this.displayCalculation();
+            }
+        }
+    }//GEN-LAST:event_jButton5MouseClicked
 
     /**
      * @param args the command line arguments
@@ -386,7 +499,6 @@ public class PurchasingForm extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> gudangSelects;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;

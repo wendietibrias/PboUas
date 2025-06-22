@@ -43,7 +43,7 @@ public class LaporanPenjualan extends javax.swing.JFrame {
             listProduct.addItem(new ComboItem(0, "Semua Produk"));
         
             for(ProductModel product : products) {
-                listProduct.addItem(new ComboItem(product.id, product.name));
+                listProduct.addItem(new ComboItem(product.id, product.sku + " - " + product.name));
             }
         } catch(Exception e){
             JOptionPane.showMessageDialog(null, e.getMessage());
@@ -53,6 +53,7 @@ public class LaporanPenjualan extends javax.swing.JFrame {
     
     private void processData() {
         ArrayList<LaporanPenjualanModel> data;
+        boolean isAll;
         
         try {
             ComboItem selectedItem = (ComboItem) listProduct.getSelectedItem();
@@ -64,7 +65,7 @@ public class LaporanPenjualan extends javax.swing.JFrame {
             int productId = selectedItem.getId();
 
             if (dateFrom.getDate() == null || dateTo.getDate() == null) {
-                JOptionPane.showMessageDialog(this, "Tanggal mulai dan akhir harus diisi.");
+                JOptionPane.showMessageDialog(this, "Tanggal dari dan sampai harus diisi.");
                 return;
             }
             
@@ -77,30 +78,62 @@ public class LaporanPenjualan extends javax.swing.JFrame {
             lpCtr = new LaporanPenjualanController();
             
             if(selectedItem.getName().equals("Semua Produk")) {
-                data = lpCtr.renderAllPenjualan(tanggalDari, tanggalSampai);
+                tableLaporan.setModel(new DefaultTableModel(
+                    new Object[][] {},
+                        
+                    new String[] {
+                        "No", "Kode SKU", "Nama Produk", "Total Terjual", "Total Pendapatan"
+                    }
+                ));
+                
+                data = lpCtr.getAllLaporanPenjualan(tanggalDari, tanggalSampai);
+                isAll = true;
             } else {
-                data = lpCtr.renderLaporanPenjualan(productId, tanggalDari, tanggalSampai);
+                tableLaporan.setModel(new DefaultTableModel(
+                    new Object[][] {},
+                        
+                    new String[] {
+                        "No", "Tanggal", "Nomor Penjualan", "Total Terjual", "Subtotal", "Metode Pembayaran"
+                    }
+                ));
+                data = lpCtr.getLaporanPenjualanByField(productId, tanggalDari, tanggalSampai);
+                isAll = false;
             }
             
-            updateTable(data);
+            updateTable(data, isAll);
         } catch(Exception e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
     }
     
-    private void updateTable(ArrayList<LaporanPenjualanModel> data) {
+    private void updateTable(ArrayList<LaporanPenjualanModel> data, boolean isAll) {
         DefaultTableModel model = (DefaultTableModel) tableLaporan.getModel();
         model.setRowCount(0);
 
         int no = 1;
         for (LaporanPenjualanModel item : data) {
-            Object[] row = {
-                no++,
-                item.getProductName(),
-                item.getTotalTerjual(),
-                formatRupiah(item.getTotalPendapatan())
-            };
-            model.addRow(row);
+            if(isAll) {
+                Object[] row = {
+                    no++,
+                    item.getProductSKU(),
+                    item.getProductName(),
+                    item.getTotalTerjual(),
+                    formatRupiah(item.getTotalPendapatan())
+                };
+                
+                model.addRow(row);
+            } else {
+                Object[] row = {
+                    no++,
+                    item.getTanggal(),
+                    item.getNomorPenjualan(),
+                    item.getTotalTerjual(),
+                    formatRupiah(item.getSubtotal()),
+                    item.getMetodePembayaran()
+                };
+                
+                model.addRow(row);
+            }
         }
     }
 
@@ -134,17 +167,17 @@ public class LaporanPenjualan extends javax.swing.JFrame {
 
         tableLaporan.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "No", "Nama Produk", "Total Terjual", "Total Pendapatan"
+                "No", "Kode SKU", "Nama Produk", "Total Terjual", "Total Pendapatan"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -158,6 +191,7 @@ public class LaporanPenjualan extends javax.swing.JFrame {
             tableLaporan.getColumnModel().getColumn(1).setResizable(false);
             tableLaporan.getColumnModel().getColumn(2).setResizable(false);
             tableLaporan.getColumnModel().getColumn(3).setResizable(false);
+            tableLaporan.getColumnModel().getColumn(4).setResizable(false);
         }
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
